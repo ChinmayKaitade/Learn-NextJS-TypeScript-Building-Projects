@@ -148,12 +148,3 @@ app/
 ```
 
 ---
-
-## 📊 Quick Summary Matrix
-
-| Convention Type        | Folder Naming Pattern | Example URL Matched                    | `params` Received                        |
-| ---------------------- | --------------------- | -------------------------------------- | ---------------------------------------- |
-| **Dynamic**            | `[slug]`              | `/blog/nextjs-16`                      | `{ slug: 'nextjs-16' }`                  |
-| **Catch-All**          | `[...slug]`           | `/shop/men/shoes/sneakers`             | `{ slug: ['men', 'shoes', 'sneakers'] }` |
-| **Optional Catch-All** | `[[...slug]]`         | `/docs` AND `/docs/install`            | `undefined` OR `{ slug: ['install'] }`   |
-| **Route Group**        | `(marketing)`         | `/about` _(Folder is hidden from URL)_ | _None_                                   |
