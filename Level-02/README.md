@@ -148,3 +148,122 @@ app/
 ```
 
 ---
+
+# 🔀 Parallel Routes in Next.js
+
+**Parallel Routes** allow you to simultaneously or conditionally render one or more pages within the exact same layout. They are perfect for complex, dynamic interfaces like dashboards, split views, or social feeds where different sections have independent data streams, loading states, and error boundaries.
+
+---
+
+## 🎰 Slots: The `@folder` Convention
+
+Parallel routes are created using named **slots**. Slots are defined using the **`@folder`** naming convention.
+
+Slots are **not** included in the URL structure. A folder named `@analytics` renders at the same URL path as its parent directory, but is passed directly into the parent `layout.tsx` as an explicit React prop.
+
+### 📂 Directory Architecture
+
+```text
+app/
+└── dashboard/
+    ├── layout.tsx         # Receives @team, @analytics, and children props
+    ├── page.tsx           # Renders as the default 'children' prop
+    ├── @team/
+    │   └── page.tsx       # Team slot view
+    └── @analytics/
+        └── page.tsx       # Analytics slot view
+
+```
+
+---
+
+## 💻 Implementation Example
+
+### Step 1: Define the Slot Components
+
+```tsx
+// app/dashboard/@analytics/page.tsx
+export default async function AnalyticsSlot() {
+  // ⚡ Each slot can fetch its own data independently
+  return (
+    <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl text-white">
+      <h2 className="text-xl font-bold mb-2">📊 Real-Time Analytics</h2>
+      <p className="text-slate-400 text-sm">Active Visitors: 1,420</p>
+    </div>
+  );
+}
+```
+
+```tsx
+// app/dashboard/@team/page.tsx
+export default async function TeamSlot() {
+  return (
+    <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl text-white">
+      <h2 className="text-xl font-bold mb-2">👥 Team Members</h2>
+      <p className="text-slate-400 text-sm">Active Engineers: 8 online</p>
+    </div>
+  );
+}
+```
+
+### Step 2: Inject Slots into the Parent Layout
+
+Pass the slots as props alongside the standard `children` prop inside `app/dashboard/layout.tsx`:
+
+```tsx
+// app/dashboard/layout.tsx
+import React from "react";
+
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+  analytics: React.ReactNode; // 👈 Maps to @analytics
+  team: React.ReactNode; // 👈 Maps to @team
+}
+
+export default function DashboardLayout({
+  children,
+  analytics,
+  team,
+}: DashboardLayoutProps) {
+  return (
+    <div className="p-8 space-y-6 max-w-6xl mx-auto">
+      {/* Primary Page Content */}
+      <main>{children}</main>
+
+      {/* Render Slots Simultaneously in a Responsive Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>{analytics}</div>
+        <div>{team}</div>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## 🏆 Key Architectural Benefits
+
+- **Independent Streaming & Loading States:** Each slot can include its own `loading.tsx` file. If `@analytics` takes 3 seconds to fetch data while `@team` finishes in 100ms, `@team` renders instantly while `@analytics` shows a localized skeleton loader—without blocking the rest of the layout!
+- **Isolated Error Handling:** Place an `error.tsx` file inside an individual slot (`@analytics/error.tsx`). If the analytics API fails, an error boundary catches it inside that specific card without crashing the entire dashboard.
+- **Conditional Rendering:** You can conditionally display slots based on user authentication or roles directly inside `layout.tsx`:
+
+```tsx
+// Conditional rendering inside dashboard layout
+export default async function Layout({ team, analytics }: Props) {
+  const user = await getCurrentUser();
+
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {team}
+      {user.isAdmin ? analytics : <p>Access Denied for Analytics</p>}
+    </div>
+  );
+}
+```
+
+---
+
+## 📄 The Role of `default.tsx`
+
+When navigating hard reloads or unmatched sub-routes, Next.js needs a fallback file to render inside a slot if the URL doesn't explicitly match a sub-page. Place a **`default.tsx`** file directly inside your slot folder (`@analytics/default.tsx`) to serve as a fallback component and prevent 404 errors.

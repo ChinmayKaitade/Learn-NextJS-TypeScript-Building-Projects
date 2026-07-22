@@ -1,7 +1,11 @@
-export default function Home() {
+import React from "react";
+
+const TeamPage = () => {
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <h1 className="text-4xl">Learning NextJS & TypeScript</h1>
+      <h1 className="text-4xl">Team Page</h1>
     </div>
   );
-}
+};
+
+export default TeamPage;
