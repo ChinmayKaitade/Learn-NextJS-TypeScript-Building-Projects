@@ -1,0 +1,1 @@
+# Learning NextJS TypeScript by Building Projects 🚀🔥
