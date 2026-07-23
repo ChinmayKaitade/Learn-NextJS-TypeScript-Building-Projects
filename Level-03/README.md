@@ -71,3 +71,48 @@ export default function LoginForm() {
 
 ---
 
+## 🖼️ Image Optimization (`next/image`)
+
+The `<Image>` component extends the native `<img>` tag with automatic image optimization:
+
+- **Format Conversion:** Converts images to modern formats like WebP or AVIF on the fly.
+- **Layout Shift Prevention:** Eliminates Cumulative Layout Shift (CLS) automatically by requiring explicit dimensions.
+- **Responsive Resizing:** Serves smaller, scaled images to mobile screens.
+- **Lazy Loading:** Images load only when scrolling into view.
+
+```tsx
+import Image from "next/image";
+
+export default function Profile() {
+  return (
+    <div className="p-4">
+      {/* 🟢 Local or explicitly dimensioned images */}
+      <Image
+        src="/avatar.jpg" // Located in public/
+        alt="User Profile"
+        width={100}
+        height={100}
+        priority // 🚀 Disables lazy loading for Above-the-Fold images (improves LCP)
+        className="rounded-full"
+      />
+    </div>
+  );
+}
+```
+
+> 🌐 **Remote Image Domain Safety:** If you load external image URLs (e.g., from Cloudinary, Unsplash, or S3), you must whitelist the hostname inside `next.config.ts`:
+>
+> ```typescript
+> // next.config.ts
+> import type { NextConfig } from "next";
+>
+> const nextConfig: NextConfig = {
+>   images: {
+>     remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],
+>   },
+> };
+> export default nextConfig;
+> ```
+
+---
+
