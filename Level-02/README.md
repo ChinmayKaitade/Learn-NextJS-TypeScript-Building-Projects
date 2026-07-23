@@ -267,3 +267,52 @@ export default async function Layout({ team, analytics }: Props) {
 ## 📄 The Role of `default.tsx`
 
 When navigating hard reloads or unmatched sub-routes, Next.js needs a fallback file to render inside a slot if the URL doesn't explicitly match a sub-page. Place a **`default.tsx`** file directly inside your slot folder (`@analytics/default.tsx`) to serve as a fallback component and prevent 404 errors.
+
+# 📁 Next.js App Router: File Conventions Reference
+
+In the Next.js App Router, routing behavior, error boundaries, streaming, and layouts are configured using specialized file naming conventions inside your route folders.
+
+---
+
+## 🧭 Complete Routing Files Matrix
+
+| File Name          | Extension      | Primary Purpose & Behavior                                                                                                                          |
+| ------------------ | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`layout`**       | `.tsx`, `.jsx` | **Shared Layout Shell:** Persists across sub-route navigations, maintains state, and does **not** re-render on navigation.                          |
+| **`page`**         | `.tsx`, `.jsx` | **Unique Page UI:** Makes a route segment publicly accessible in the browser URL.                                                                   |
+| **`loading`**      | `.tsx`, `.jsx` | **Instant Loading UI:** Automatically wraps the sibling `page.tsx` inside a React `Suspense` boundary to stream UI instantly.                       |
+| **`not-found`**    | `.tsx`, `.jsx` | **404 UI:** Renders when `notFound()` is triggered or when a requested URL path segment does not exist.                                             |
+| **`error`**        | `.tsx`, `.jsx` | **Segment Error Boundary:** Wraps sibling page subtrees in a React Error Boundary. Must be a Client Component (`"use client"`).                     |
+| **`global-error`** | `.tsx`, `.jsx` | **Root Error Boundary:** Replaces the root `<html>` and `<body>` tags to catch fatal errors occurring inside the top-level `layout.tsx`.            |
+| **`route`**        | `.ts`, `.js`   | **Serverless API Endpoint:** Handles standard HTTP verbs (`GET`, `POST`, `PUT`, `DELETE`). Cannot exist alongside `page.tsx` in the same folder.    |
+| **`template`**     | `.tsx`, `.jsx` | **Re-rendering Layout:** Similar to `layout.tsx`, but creates a brand-new component instance and re-renders state on every navigation.              |
+| **`default`**      | `.tsx`, `.jsx` | **Parallel Route Fallback:** Acts as the fallback UI for Parallel Route slots (`@slot`) when Next.js cannot recover slot state after a hard reload. |
+
+---
+
+## ⚡ Server Components vs. Client Components
+
+> 💡 **Important Distinction:** In the Next.js App Router, **every component inside the `app/` directory is a React Server Component (RSC) by default**.
+
+- **Server Components (Default):** Render exclusively on the server. They can fetch data asynchronously using standard `async/await`, directly query databases, and keep secret keys hidden from the client bundle.
+- **Client Components (`"use client"`):** Enable interactivity. If you need client-side React features like state (`useState`), side-effects (`useEffect`), event handlers (`onClick`), or browser APIs (`window`), you must place the `"use client"` directive at the very top of your file.
+
+```tsx
+// Example Client Component (e.g., app/components/Counter.tsx)
+"use client";
+
+import { useState } from "react";
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <button
+      onClick={() => setCount(count + 1)}
+      className="px-4 py-2 bg-indigo-600 text-white rounded-lg"
+    >
+      Count: {count}
+    </button>
+  );
+}
+```
