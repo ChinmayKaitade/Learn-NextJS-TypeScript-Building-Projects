@@ -116,3 +116,47 @@ export default function Profile() {
 
 ---
 
+## 🔤 Font Optimization (`next/font`)
+
+`next/font` automatically optimizes your typography by **downloading Google Fonts at build time** and hosting them directly alongside your static assets. This eliminates external network requests to Google servers at runtime, improving performance and privacy while preventing zero-layout-shift font swaps.
+
+```tsx
+// app/layout.tsx
+import { Inter, Poppins } from "next/font/google";
+import "./globals.css";
+
+// 1. Initialize fonts with required subsets
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const poppins = Poppins({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-poppins", // Useful for Tailwind CSS integration
+});
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" className={`${inter.className} ${poppins.variable}`}>
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+---
+
+## 📊 Summary Reference
+
+| Tool / API        | Primary Purpose          | Best Practice Use Case                                         |
+| ----------------- | ------------------------ | -------------------------------------------------------------- |
+| **`<Link>`**      | Declarative navigation   | Standard links, header menus, footer navigation.               |
+| **`useRouter()`** | Programmatic navigation  | Post-form submission, custom state triggers, manual redirects. |
+| **`<Image>`**     | Image asset optimization | All web images (prevents CLS, auto-resizes, lazy loads).       |
+| **`next/font`**   | Zero-CLS font hosting    | Loading Google Fonts or local custom fonts efficiently.        |
